@@ -42,6 +42,9 @@ To construct the correct solution, you can either offset decisions to the dead-e
 
 
 ### Palindrome Partitioning
+
+Given a string, partition the string so that each substring is a palindrome. Return an array of partitions for all possible palindromes that can be generated in the string.
+
 Track state: An index to start the substring at (as start position), a results array (as result) and an array of substrings in current traversal tree (as solution)
 
 Dead end logic: If position > last index of the string then put current array of substrings into result
@@ -93,8 +96,55 @@ end
 
 ### Generate Parenthesis
 
+Given a number *n*, generate every possible combination of *n* well-formed *pairs* parenthesis.
+
+Example: if *n* = 3, return:
+```
+[
+  "((()))",
+  "(()())",
+  "(())()",
+  "()(())",
+  "()()()"
+]
+```
+Track state: A string that begins empty and is added an opening or closing parenthesis on each recurse. The number of opening parenthesis in current string. The number of closing parenthesis in current string.
+
+Dead-end logic: If the string is of length *n* * 2, then place the string into the results array
+
+Branching-logic:
+Two branch conditions that are always evaluated:
+1. If # of openings < *n* then recurse, passing in the current_string + "(" and an incremented open parenthesis tracker
+2. If # of closings < number of openings then recurse, passing in current_string + ")" and an incremented close parenthesis tracker
+
+The way state of the solution is maintained is that concatenating a string generates a new string, so a new string is passed into each recurse, meaning there are no mutations that need to be reversed when a recursive call "pops" back up.
+
+Coded solution:
+```
+def generate_parenthesis(n)
+    result = []
+    parens(n, '', result, 0, 0)
+    result
+end
 
 
+def parens(max, current, result, open, close)
+  p current
+  if current.length == max*2
+    result << current
+  else
+    if open < max
+      parens(max, current + "(", result, open + 1, close)
+    end
+    
+    if close < open
+      parens(max, current + ")", result, open, close + 1)
+    end
+  end
+end
+
+p generate_parenthesis(3)
+```
 
 
 
