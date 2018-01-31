@@ -42,13 +42,12 @@ To construct the correct solution, you can either offset decisions to the dead-e
 
 
 ### Palindrome Partitioning
-Track state: An index to start the substring at (as position), a results array (as result) and an array of substrings in current traversal (as solution)
+Track state: An index to start the substring at (as start position), a results array (as result) and an array of substrings in current traversal tree (as solution)
 
-Dead end logic: If position > last index of the string
+Dead end logic: If position > last index of the string then put current array of substrings into result
 
 Branch logic:
-Loop through string, generating substring at position..current_idx
-If this substring is a palindrome, then recurse into next branch, setting the start position to current index + 1 so that letters already in the solution are not reconsidered
+Loop through string. Generate a substring from start position to current index. If substring is a palindrome, add it so the current solution array and then recurse down a branch of the tree, setting the start position to the index of the current_char + 1 (to make sure the same letter at the same index is not used more than once).
 
 
 Decision tree for input "aab": 
