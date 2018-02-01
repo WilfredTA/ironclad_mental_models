@@ -43,52 +43,57 @@ To construct the correct solution, you can either offset decisions to the dead-e
 
 ### Palindrome Partitioning
 
-Given a string, partition the string so that each substring is a palindrome. Return an array of partitions for all possible palindromes that can be generated in the string.
+### Palindrome Partitioning
+- before adding to the solution, need to decide if the string is palandrome first(T/F)
+- add the palindrome substring into solution, range is start..i+1
+- recursion stops when we done iterating through each char in the given string
+- reset the conditions for the solution
 
-Track state: An index to start the substring at (as start position), a results array (as result) and an array of substrings in current traversal tree (as solution)
-
-Dead end logic: If position > last index of the string then put current array of substrings into result
-
-Branch logic:
-Loop through string. Generate a substring from start position to current index. If substring is a palindrome, add it so the current solution array and then recurse down a branch of the tree, setting the start position to the index of the current_char + 1 (to make sure the same letter at the same index is not used more than once).
-
-
-Decision tree for input "aab": 
+example diagram:
+branching for input "aab", number represents the indices: 
 ```
-          "a"            "aa"     "aab"
-          / \               \
-        "a" "ab"             "b"
-       / 
-     "b"
+                   aab
+                /   |    \
+              0,0  0,1  0,2 
+              a    aa   aab
+             / \    |     \
+           1,1 1,2  2     nil
+            a  ab   b(2)
+            /
+           b
 ```
-Return value: `[['a','a','b'],['aa', 'b']]`
+Return value: `[['a','a','b'],['aa', 'b']]`, skip value: `[['a','ab'],['aab']]`
 
 Coded solution:
 ```
 def partition(s)
-    result = []
-    partition_helper(s, result, [], 0)
-    result
+  result = []
+  partition_helper(s, 0, [], result)
+  result
 end
 
-
-def partition_helper(string, result, solution, position)
-  
-  if position == string.length 
-    result << solution.clone unless solution.empty?
+def partition_helper(s, start_idx, solution, result)
+  if start_idx == s.length
+    result << solution.clone
   else
-    i = position
-    while i < string.length do
-      substring = string[position..i]
-      if substring == substring.reverse
+    (start_idx..s.length-1).each do |index|
+      substring = s.slice(start_idx..index)
+      if check_pal(substring)
         solution << substring
-        partition_helper(string, result, solution, i + 1)
+        partition_helper(s, index + 1, solution, result)
         solution.pop
       end
-      
-      i += 1
     end
   end
+end
+
+def check_pal(substring)
+  (0..substring.length/2).each do |index|
+    if substring[index] != substring[substring.length-index-1]
+      return false
+    end
+  end
+  true
 end
 
 
@@ -108,42 +113,42 @@ Example: if *n* = 3, return:
   "()()()"
 ]
 ```
-Track state: A string that begins empty and is added an opening or closing parenthesis on each recurse. The number of opening parenthesis in current string. The number of closing parenthesis in current string.
 
-Dead-end logic: If the string is of length *n* * 2, then place the string into the results array
-
-Branching-logic:
-Two branch conditions that are always evaluated:
-1. If # of openings < *n* then recurse, passing in the current_string + "(" and an incremented open parenthesis tracker
-2. If # of closings < number of openings then recurse, passing in current_string + ")" and an incremented close parenthesis tracker
-
-The way state of the solution is maintained is that concatenating a string generates a new string, so a new string is passed into each recurse, meaning there are no mutations that need to be reversed when a recursive call "pops" back up.
+Thinking process:
+- write the two parans "(" and right paran ")", length of each side has to be equal to n
+- during the generating process, 
+- 1: you have to make sure the length of "(" is greater than  the length of ")" before you 
+     try to add new ")" => add the left parans first before adding right 
+  2. only write the valid parans into solution, be sure to mutate the string
 
 Coded solution:
 ```
 def generate_parenthesis(n)
-    result = []
-    parens(n, '', result, 0, 0)
-    result
+  result = []
+  generate_parenthesis_helper(n,0,0,"",result)
+  result
 end
 
-
-def parens(max, current, result, open, close)
-  p current
-  if current.length == max*2
-    result << current
-  else
-    if open < max
-      parens(max, current + "(", result, open + 1, close)
-    end
-    
-    if close < open
-      parens(max, current + ")", result, open, close + 1)
-    end
+def generate_parenthesis_helper(n,left,right,solution,result)
+  # add solution to the result
+  if left == n && right == n
+    result << solution.clone
+  end
+  
+  if (left < n)
+    solution << "("
+    generate_parenthesis_helper(n,left+1,right,solution,result)
+    solution.chop!
+  end
+  
+  if (right < left)
+    solution << ")"
+    generate_parenthesis_helper(n,left,right+1,solution,result)
+    solution.chop!
   end
 end
 
-p generate_parenthesis(3)
+
 ```
 
 
