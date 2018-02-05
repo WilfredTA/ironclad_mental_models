@@ -97,7 +97,7 @@ Notes on negative powers:
 2) Dealing with decimals. If we want to find `power(2, -2)`, then our algorithm   
    will run 1/4 as its final operation. In Ruby this will return 0, but the
    answer we're looking for is `0.25`. Therefore using `1.0` ensures that we'll
-   return be able to return the correct decimal number (a float).
+   return be able to return the correct decimal number (  a float).
 
 Runtime - O(n):  
 Size - O(n): Only n number of stacks required at any one time.
@@ -148,4 +148,25 @@ def power(base, exponent)
     return base * half * half
   end
 end
+```
+
+**Solution 5: Tail optimized**
+
+Tail optimization is another important technique in recursion. Normally, the
+number of stacks is `n` deep where `n` is the problem size. With a tail
+optimized problem, we can calculate the answer from the bottom level of the
+stack. The significance of this is that the preceding stacks are dropped by the
+smart compiler since they don't need to be maintained, reducing the space
+complexity of the algorithm.
+
+```js
+let power = (base, power_of, acc=base) => {
+  if (power_of === 0) {
+    return 1
+  } else if (power_of === 1) {
+    return acc
+  } else {
+    return power(base, power_of - 1, base * acc);
+  }
+}
 ```
